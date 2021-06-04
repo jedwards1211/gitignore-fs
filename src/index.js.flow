@@ -1,0 +1,28 @@
+// @flow
+
+export interface FsStats {
+  isFile(): boolean;
+  isDirectory(): boolean;
+}
+
+export interface Fs {
+  statSync(path: string): FsStats;
+  readFileSync(
+    path: string,
+    options?: string | { encoding?: string, flag?: string }
+  ): string;
+}
+
+export interface Git {
+  getCoreExcludesFile(options: { cwd: string }): string | void;
+}
+
+declare export default class Gitignore {
+  constructor(options?: {|
+    fs?: Fs,
+    git?: Git,
+    env?: { [string]: string | void },
+  |}): void;
+
+  ignores(path: string, stats?: FsStats): boolean;
+}

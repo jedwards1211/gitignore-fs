@@ -1,31 +1,45 @@
-# typescript-library-skeleton
+# gitignore-fs
 
-[![CircleCI](https://circleci.com/gh/jedwards1211/typescript-library-skeleton.svg?style=svg)](https://circleci.com/gh/jedwards1211/typescript-library-skeleton)
-[![Coverage Status](https://codecov.io/gh/jedwards1211/typescript-library-skeleton/branch/master/graph/badge.svg)](https://codecov.io/gh/jedwards1211/typescript-library-skeleton)
+[![CircleCI](https://circleci.com/gh/jedwards1211/gitignore-fs.svg?style=svg)](https://circleci.com/gh/jedwards1211/gitignore-fs)
+[![Coverage Status](https://codecov.io/gh/jedwards1211/gitignore-fs/branch/master/graph/badge.svg)](https://codecov.io/gh/jedwards1211/gitignore-fs)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![npm version](https://badge.fury.io/js/typescript-library-skeleton.svg)](https://badge.fury.io/js/typescript-library-skeleton)
+[![npm version](https://badge.fury.io/js/gitignore-fs.svg)](https://badge.fury.io/js/gitignore-fs)
 
-This is my personal skeleton for creating an typescript library npm package. You are welcome to use it.
+Determine if any file is gitignored. This is intended to be a complete implementation of the gitignore spec, including `$GIT_DIR`, `$GIT_DIR/info/excludes`, and the `core.excludesFile` configuration variable.
 
-## Quick start
+# Getting started
 
-```sh
-npx 0-60 clone https://github.com/jedwards1211/typescript-library-skeleton.git
+```
+npm install --save gitignore-fs
 ```
 
-## Tools used
+```js
+const Gitignore = require('gitignore-fs')
 
-- babel 7
-- typescript
-- mocha
-- chai
-- istanbul
-- nyc
-- eslint
-- prettier
-- husky
-- semantic-release
-- renovate
-- Circle CI
-- Codecov.io
+const gitignore = new Gitignore()
+
+console.log(gitignore.ignores('node_modules')) // true or false depending on your config
+```
+
+# API
+
+## `class Gitignore`
+
+Each instance of this class keeps a separate cache of gitignore rules.
+
+### `.ignores(path, [stats])`
+
+Determines if the given `path` is gitignored.
+
+#### `path` (`string`, **required**)
+
+The path to test
+
+#### `stats` (`fs.Stats`, _optional_)
+
+The stats for `path`. Pass them if you already have them to speed things up.
+
+#### Returns (`boolean`)
+
+`true` if `path` is gitignored, `false` otherwise
