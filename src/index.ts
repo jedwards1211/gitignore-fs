@@ -50,23 +50,31 @@ const defaultGit: Git = {
   }: {
     cwd: string
   }): Promise<string | undefined> {
-    const { stdout } = await spawn(
-      'git',
-      ['config', '--get', 'core.excludesFile'],
-      {
-        cwd,
-        maxBuffer: 1024 * 1024,
-      }
-    )
-    return stdout?.toString()?.trim()
+    try {
+      const { stdout } = await spawn(
+        'git',
+        ['config', '--get', 'core.excludesFile'],
+        {
+          cwd,
+          maxBuffer: 1024 * 1024,
+        }
+      )
+      return stdout?.toString()?.trim()
+    } catch (error) {
+      return undefined
+    }
   },
   getCoreExcludesFileSync({ cwd }: { cwd: string }) {
-    return spawnSync('git', ['config', '--get', 'core.excludesFile'], {
-      cwd,
-      maxBuffer: 1024 * 1024,
-    })
-      .stdout?.toString()
-      ?.trim()
+    try {
+      return spawnSync('git', ['config', '--get', 'core.excludesFile'], {
+        cwd,
+        maxBuffer: 1024 * 1024,
+      })
+        .stdout?.toString()
+        ?.trim()
+    } catch (error) {
+      return undefined
+    }
   },
 }
 
