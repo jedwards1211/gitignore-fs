@@ -30,7 +30,7 @@ Each instance of this class keeps a separate cache of gitignore rules.
 
 ### `.ignores(path, [stats])`
 
-Determines if the given `path` is gitignored.
+Determines if the given `path` is gitignored. This method may do sync fs operations, right now there is no async method.
 
 #### `path` (`string`, **required**)
 
