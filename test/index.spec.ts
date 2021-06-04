@@ -190,9 +190,18 @@ describe('test setup', () => {
           '.gitignore': dedent`
             !*.js
             !/*.json
+            stuff/**/*.js
           `,
           'test.js': `console.log('test')`,
           'test.json': '{}',
+          stuff: {
+            'index.js': '',
+          },
+          foo: {
+            stuff: {
+              'index.js': '',
+            },
+          },
           subdir: {
             'test.js': `console.log('test')`,
             'test.json': '{}',
@@ -208,6 +217,7 @@ describe('test setup', () => {
       'test.js',
       'lib/index.js',
       'src/subdir/test.json',
+      'src/stuff/index.js',
       'node_modules',
       'node_modules/foo',
       'node_modules/foo/package.json',
@@ -216,6 +226,7 @@ describe('test setup', () => {
       'src/test.js',
       'src/test.json',
       'src/subdir/test.js',
+      'src/foo/stuff/index.js',
     ])
   })
   it(`nested repo with .git/info/exclude`, function () {
@@ -271,6 +282,7 @@ describe('test setup', () => {
           `,
           'myfile.txt': '',
           'index.txt': '',
+
           node_modules: {
             foo: {
               'package.json': dedent`

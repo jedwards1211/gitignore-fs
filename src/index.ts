@@ -56,7 +56,9 @@ function prefixGitignoreRules(
   return rules.map(function prefixRule(rule: string): string {
     if (rule.startsWith('#') || !/\S/.test(rule)) return rule
     if (rule.startsWith('!')) return '!' + prefixRule(rule.substring(1))
-    return /\/\S/.test(rule) ? `${prefix}${rule}` : `${prefix}/**/${rule}`
+    return /\/\S/.test(rule)
+      ? `${prefix}/${rule.replace(/^\//, '')}`
+      : `${prefix}/**/${rule}`
   })
 }
 
