@@ -11,10 +11,16 @@ export interface Fs {
     path: string,
     options?: string | { encoding?: string, flag?: string }
   ): string;
+  stat(path: string): Promise<FsStats>;
+  readFile(
+    path: string,
+    options?: string | { encoding?: string, flag?: string, signal?: any }
+  ): string;
 }
 
 export interface Git {
-  getCoreExcludesFile(options: { cwd: string }): string | void;
+  getCoreExcludesFile(options: { cwd: string }): Promise<string | void>;
+  getCoreExcludesFileSync(options: { cwd: string }): string | void;
 }
 
 declare export default class Gitignore {
@@ -24,5 +30,7 @@ declare export default class Gitignore {
     env?: { [string]: string | void },
   |}): void;
 
-  ignores(path: string, stats?: FsStats): boolean;
+  clearCache(): void;
+  ignores(path: string, stats?: FsStats): Promise<boolean>;
+  ignoresSync(path: string, stats?: FsStats): boolean;
 }

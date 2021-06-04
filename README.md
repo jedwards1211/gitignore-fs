@@ -30,7 +30,23 @@ Each instance of this class keeps a separate cache of gitignore rules.
 
 ### `.ignores(path, [stats])`
 
-Determines if the given `path` is gitignored. This method may do sync fs operations, right now there is no async method.
+Determines if the given `path` is gitignored asynchronously.
+
+#### `path` (`string`, **required**)
+
+The path to test
+
+#### `stats` (`fs.Stats`, _optional_)
+
+The stats for `path`. Pass them if you already have them to speed things up.
+
+#### Returns (`Promise<boolean>`)
+
+A promise that will resolve to `true` if `path` is gitignored, `false` otherwise
+
+### `.ignoresSync(path, [stats])`
+
+Determines if the given `path` is gitignored synchronously.
 
 #### `path` (`string`, **required**)
 
@@ -43,3 +59,7 @@ The stats for `path`. Pass them if you already have them to speed things up.
 #### Returns (`boolean`)
 
 `true` if `path` is gitignored, `false` otherwise
+
+### `.clearCache()`
+
+Clears the entire gitignore rule cache.

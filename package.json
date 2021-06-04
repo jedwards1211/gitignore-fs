@@ -128,6 +128,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
-    "ignore": "^5.1.8"
+    "ignore": "^5.1.8",
+    "promisify-child-process": "^4.1.1"
   }
 }
