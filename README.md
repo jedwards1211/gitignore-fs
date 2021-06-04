@@ -8,6 +8,8 @@
 
 Determine if any file is gitignored. This is intended to be a complete implementation of the gitignore spec, including `$GIT_DIR`, `$GIT_DIR/info/excludes`, and the `core.excludesFile` configuration variable.
 
+**Requires Node >= 14.**
+
 # Getting started
 
 ```

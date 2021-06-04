@@ -4,6 +4,9 @@
   "description": "determine if any file is gitignored (complete implementation of gitignore rules)",
   "main": "index.js",
   "sideEffects": false,
+  "engines": {
+    "node": ">=14"
+  },
   "scripts": {
     "lint": "eslint $npm_package_config_lint",
     "lint:fix": "eslint $npm_package_config_lint",
