@@ -5,7 +5,7 @@
   "main": "index.js",
   "sideEffects": false,
   "engines": {
-    "node": ">=14"
+    "node": ">=8"
   },
   "scripts": {
     "lint": "eslint $npm_package_config_lint",

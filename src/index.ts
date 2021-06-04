@@ -1,6 +1,6 @@
 import createIgnore, { Ignore } from 'ignore'
 import fs from 'fs'
-import fsPromises from 'fs/promises'
+import { promisify } from 'util'
 import Path from 'path'
 import { spawnSync } from 'child_process'
 import { spawn } from 'promisify-child-process'
@@ -25,10 +25,9 @@ export interface Fs {
 }
 
 const defaultFs: Fs = {
-  stat: fsPromises.stat,
+  stat: promisify(fs.stat),
   statSync: fs.statSync,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readFile: fsPromises.readFile as any,
+  readFile: promisify(fs.readFile),
   readFileSync: fs.readFileSync,
 }
 
