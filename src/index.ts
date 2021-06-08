@@ -78,6 +78,17 @@ const defaultGit: Git = {
   },
 }
 
+function normalizeInputPath(path: string): string {
+  const result = Path.normalize(Path.resolve(path))
+  return path.endsWith('/') ? result + '/' : result
+}
+
+function relativePath(from: string, to: string): string {
+  return to.endsWith('/')
+    ? Path.relative(from, to) + '/'
+    : Path.relative(from, to)
+}
+
 class DirectoryEntry {
   ignore: Ignore
   rootDir: string
@@ -90,7 +101,7 @@ class DirectoryEntry {
   ignores(path: string): boolean {
     return (
       path !== this.rootDir &&
-      this.ignore.ignores(Path.relative(this.rootDir, path))
+      this.ignore.ignores(relativePath(this.rootDir, path))
     )
   }
 }
@@ -137,32 +148,18 @@ export default class Gitignore {
     this.directoriesAsync = {}
   }
 
-  async ignores(path: string, stats?: FsStats): Promise<boolean> {
-    path = Path.resolve(path)
-    if (!stats) {
-      try {
-        stats = await this.fs.stat(path)
-      } catch (error) {
-        // ignore
-      }
-    }
+  async ignores(path: string): Promise<boolean> {
+    path = normalizeInputPath(path)
     const dirEntry = await this.getDirectoryEntry(
-      stats?.isDirectory() ? Path.dirname(path) : path
+      path.endsWith('/') ? Path.dirname(path) : path
     )
     return dirEntry.ignores(path)
   }
 
-  ignoresSync(path: string, stats?: FsStats): boolean {
-    path = Path.resolve(path)
-    if (!stats) {
-      try {
-        stats = this.fs.statSync(path)
-      } catch (error) {
-        // ignore
-      }
-    }
+  ignoresSync(path: string): boolean {
+    path = normalizeInputPath(path)
     const dirEntry = this.getDirectoryEntrySync(
-      stats?.isDirectory() ? Path.dirname(path) : path
+      path.endsWith('/') ? Path.dirname(path) : path
     )
     return dirEntry.ignores(path)
   }

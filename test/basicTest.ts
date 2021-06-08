@@ -21,5 +21,5 @@ declareTest('basic test', {
       'test.js': '',
     },
   },
-  expectIncludes: ['src', 'src/test.js', '.gitignore'],
+  expectIncludes: ['src/test.js', '.gitignore'],
 })

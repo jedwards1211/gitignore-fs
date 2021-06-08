@@ -30,33 +30,25 @@ console.log(gitignore.ignores('node_modules')) // true or false depending on you
 
 Each instance of this class keeps a separate cache of gitignore rules.
 
-### `.ignores(path, [stats])`
+### `.ignores(path)`
 
 Determines if the given `path` is gitignored asynchronously.
 
 #### `path` (`string`, **required**)
 
-The path to test
-
-#### `stats` (`fs.Stats`, _optional_)
-
-The stats for `path`. Pass them if you already have them to speed things up.
+The path to test. **Must end with / if it is a directory!**
 
 #### Returns (`Promise<boolean>`)
 
 A promise that will resolve to `true` if `path` is gitignored, `false` otherwise
 
-### `.ignoresSync(path, [stats])`
+### `.ignoresSync(path)`
 
 Determines if the given `path` is gitignored synchronously.
 
 #### `path` (`string`, **required**)
 
-The path to test
-
-#### `stats` (`fs.Stats`, _optional_)
-
-The stats for `path`. Pass them if you already have them to speed things up.
+The path to test. **Must end with / if it is a directory!**
 
 #### Returns (`boolean`)
 

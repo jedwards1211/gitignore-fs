@@ -57,7 +57,7 @@ declareTest('nested repo with .git/info/exclude', {
   },
   expectIncludes: [
     '.gitignore',
-    'lib',
+    'lib/',
     'src/.gitignore',
     'src/test.js',
     'src/test.json',

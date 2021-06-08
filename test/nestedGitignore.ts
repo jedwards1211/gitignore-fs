@@ -44,11 +44,11 @@ declareTest('nested .gitignore', {
   },
   expectIncludes: [
     '.gitignore',
-    'lib',
+    'lib/',
     'src/.gitignore',
     'src/test.js',
     'src/test.json',
-    'src/stuff',
+    'src/stuff/',
     'src/subdir/test.js',
     'src/foo/stuff/index.js',
   ],

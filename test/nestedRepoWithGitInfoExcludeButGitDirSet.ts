@@ -58,7 +58,7 @@ declareTest('nested repo with .git/info/exclude but $GIT_DIR set', {
   env: { GIT_DIR: '.git' },
   expectIncludes: [
     '.gitignore',
-    'lib',
+    'lib/',
     'src/.gitignore',
     'src/test.js',
     'src/test.json',

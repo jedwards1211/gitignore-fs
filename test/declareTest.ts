@@ -7,10 +7,10 @@ import { expect } from 'chai'
 import { describe, it } from 'mocha'
 
 class TestFs implements Fs, FsPromises {
-  entries: Record<string, any>
+  paths: Record<string, any>
 
-  constructor(entries: Record<string, any>) {
-    this.entries = entries
+  constructor(paths: Record<string, any>) {
+    this.paths = paths
   }
 
   getEntry(path: string): string | Record<string, any> | void {
@@ -22,7 +22,7 @@ class TestFs implements Fs, FsPromises {
         ? parentEntry[Path.basename(path)]
         : undefined
     }
-    return this.entries[path]
+    return this.paths[path]
   }
 
   statSync(path: string): FsStats {
@@ -53,13 +53,14 @@ class TestFs implements Fs, FsPromises {
   }
 }
 
-function getAllEntries(files: Record<string, any>): string[] {
+function getAllPaths(files: Record<string, any>): string[] {
   const result: string[] = []
-  function helper(dir: string, entries: Record<string, any>) {
-    for (const key in entries) {
-      const resolved = dir ? `${dir}/${key}` : key
+  function helper(dir: string, paths: Record<string, any>) {
+    for (const key in paths) {
+      const value = paths[key]
+      const subpath = value instanceof Object ? key + '/' : key
+      const resolved = dir ? dir + subpath : subpath
       result.push(resolved)
-      const value = entries[key]
       if (value instanceof Object) {
         helper(resolved, value)
       }
@@ -74,7 +75,7 @@ function addParentDirs(files: string[]): string[] {
   for (const file of files) {
     let parent = Path.dirname(file)
     while (parent && parent !== '.' && parent !== '/') {
-      result.push(parent)
+      result.push(parent + '/')
       parent = Path.dirname(parent)
     }
   }
@@ -99,13 +100,14 @@ class TestGit implements Git {
 export default function declareTest(
   description: string,
   options: {
+    only?: boolean
     files: Record<string, any>
     coreExcludesFile?: string
     env?: Record<string, string | undefined>
     expectIncludes: string[]
   }
 ): void {
-  describe(description, () => {
+  const body = () => {
     for (const clearCache of [true, false]) {
       const { files, coreExcludesFile, env } = options
 
@@ -121,20 +123,20 @@ export default function declareTest(
           const actualSync = {}
           const actualAsync = {}
 
-          for (const file of getAllEntries(files)) {
+          for (const path of getAllPaths(files)) {
             if (clearCache) gitignore.clearCache()
-            actualSync[file] = gitignore.ignoresSync(file)
+            actualSync[path] = gitignore.ignoresSync(path)
           }
           gitignore.clearCache()
-          for (const file of getAllEntries(files)) {
+          for (const path of getAllPaths(files)) {
             if (clearCache) gitignore.clearCache()
-            actualAsync[file] = await gitignore.ignores(file)
+            actualAsync[path] = await gitignore.ignores(path)
           }
 
           let expected = {}
           const allIncluded = new Set(addParentDirs(options.expectIncludes))
           expected = Object.fromEntries(
-            getAllEntries(files).map((path) => [path, !allIncluded.has(path)])
+            getAllPaths(files).map((path) => [path, !allIncluded.has(path)])
           )
 
           expect(actualSync, 'ignoresSync results').to.deep.equal(expected)
@@ -142,5 +144,7 @@ export default function declareTest(
         }
       )
     }
-  })
+  }
+  if (options.only) describe.only(description, body)
+  else describe(description, body)
 }
