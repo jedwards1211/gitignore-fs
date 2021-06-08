@@ -188,38 +188,32 @@ export default class Gitignore {
     if (this.isRoot(dir) || this.isGitRootSync(dir)) {
       return this.createRootDirectoryEntrySync(dir)
     }
+    const parentEntry = this.getDirectoryEntrySync(Path.dirname(dir))
     const gitignore = Path.join(dir, '.gitignore')
-    if (this.isFileSync(gitignore)) {
-      const parentEntry = this.getDirectoryEntrySync(Path.dirname(dir))
-      if (parentEntry.ignores(dir + '/')) return parentEntry
-      const { rootDir } = parentEntry
-      const entry = new DirectoryEntry(rootDir)
-      entry.ignore.add(parentEntry.ignore)
-      const gitignoreRules = this.parseGitignoreSync(gitignore)
-      entry.ignore.add(prefixGitignoreRules(gitignoreRules, dir, rootDir))
-      return entry
-    } else {
-      return this.getDirectoryEntrySync(Path.dirname(dir))
-    }
+    if (parentEntry.ignores(dir + '/') || !this.isFileSync(gitignore))
+      return parentEntry
+    const { rootDir } = parentEntry
+    const entry = new DirectoryEntry(rootDir)
+    entry.ignore.add(parentEntry.ignore)
+    const gitignoreRules = this.parseGitignoreSync(gitignore)
+    entry.ignore.add(prefixGitignoreRules(gitignoreRules, dir, rootDir))
+    return entry
   }
 
   private async createDirectoryEntry(dir: string): Promise<DirectoryEntry> {
     if (this.isRoot(dir) || (await this.isGitRoot(dir))) {
       return await this.createRootDirectoryEntry(dir)
     }
+    const parentEntry = await this.getDirectoryEntry(Path.dirname(dir))
     const gitignore = Path.join(dir, '.gitignore')
-    if (await this.isFile(gitignore)) {
-      const parentEntry = await this.getDirectoryEntry(Path.dirname(dir))
-      if (parentEntry.ignores(dir + '/')) return parentEntry
-      const { rootDir } = parentEntry
-      const entry = new DirectoryEntry(rootDir)
-      entry.ignore.add(parentEntry.ignore)
-      const gitignoreRules = await this.parseGitignore(gitignore)
-      entry.ignore.add(prefixGitignoreRules(gitignoreRules, dir, rootDir))
-      return entry
-    } else {
-      return await this.getDirectoryEntry(Path.dirname(dir))
-    }
+    if (parentEntry.ignores(dir + '/') || !(await this.isFile(gitignore)))
+      return parentEntry
+    const { rootDir } = parentEntry
+    const entry = new DirectoryEntry(rootDir)
+    entry.ignore.add(parentEntry.ignore)
+    const gitignoreRules = await this.parseGitignore(gitignore)
+    entry.ignore.add(prefixGitignoreRules(gitignoreRules, dir, rootDir))
+    return entry
   }
 
   private getGitDir(): string | undefined {
