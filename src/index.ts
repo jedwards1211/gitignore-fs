@@ -191,6 +191,7 @@ export default class Gitignore {
     const gitignore = Path.join(dir, '.gitignore')
     if (this.isFileSync(gitignore)) {
       const parentEntry = this.getDirectoryEntrySync(Path.dirname(dir))
+      if (parentEntry.ignores(dir + '/')) return parentEntry
       const { rootDir } = parentEntry
       const entry = new DirectoryEntry(rootDir)
       entry.ignore.add(parentEntry.ignore)
@@ -209,6 +210,7 @@ export default class Gitignore {
     const gitignore = Path.join(dir, '.gitignore')
     if (await this.isFile(gitignore)) {
       const parentEntry = await this.getDirectoryEntry(Path.dirname(dir))
+      if (parentEntry.ignores(dir + '/')) return parentEntry
       const { rootDir } = parentEntry
       const entry = new DirectoryEntry(rootDir)
       entry.ignore.add(parentEntry.ignore)

@@ -11,6 +11,9 @@ declareTest('directory only exclusion', {
     `,
     lib: {
       foo: '',
+      bar: {
+        baz: '',
+      },
     },
     src: {
       'test.js': '',
