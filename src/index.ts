@@ -230,6 +230,7 @@ export default class Gitignore {
 
   private createRootDirectoryEntrySync(dir: string): DirectoryEntry {
     const entry = new DirectoryEntry(dir)
+    entry.ignore.add('.git')
     const addGitignoreRules = (file: string) => {
       let rules
       try {
@@ -253,6 +254,7 @@ export default class Gitignore {
 
   private async createRootDirectoryEntry(dir: string): Promise<DirectoryEntry> {
     const entry = new DirectoryEntry(dir)
+    entry.ignore.add('.git')
     const addGitignoreRules = async (file: string): Promise<void> => {
       let rules
       try {
