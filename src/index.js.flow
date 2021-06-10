@@ -28,6 +28,8 @@ declare export default class Gitignore {
     fs?: Fs,
     git?: Git,
     env?: { [string]: string | void },
+    initialRules?: string[],
+    finalRules?: string[],
   |}): void;
 
   clearCache(): void;

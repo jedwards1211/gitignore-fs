@@ -105,11 +105,13 @@ export default function declareTest(
     coreExcludesFile?: string
     env?: Record<string, string | undefined>
     expectIncludes: string[]
+    initialRules?: string[]
+    finalRules?: string[]
   }
 ): void {
   const body = () => {
     for (const clearCache of [true, false]) {
-      const { files, coreExcludesFile, env } = options
+      const { files, coreExcludesFile, env, initialRules, finalRules } = options
 
       it(
         clearCache ? 'clearing cache every time' : 'not clearing cache',
@@ -118,6 +120,8 @@ export default function declareTest(
             fs: new TestFs(files),
             git: new TestGit({ coreExcludesFile }),
             env,
+            initialRules,
+            finalRules,
           })
 
           const actualSync = {}

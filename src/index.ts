@@ -92,6 +92,7 @@ function relativePath(from: string, to: string): string {
 class DirectoryEntry {
   ignore: Ignore
   rootDir: string
+  loadedRules: string[] = []
 
   constructor(rootDir: string) {
     this.rootDir = rootDir
@@ -103,6 +104,19 @@ class DirectoryEntry {
       path !== this.rootDir &&
       this.ignore.ignores(relativePath(this.rootDir, path))
     )
+  }
+
+  add(
+    rules: DirectoryEntry | string[],
+    options?: { addToLoadedRules?: boolean }
+  ): void {
+    if (rules instanceof DirectoryEntry) {
+      this.add(rules.loadedRules, options)
+    } else {
+      if (options?.addToLoadedRules !== false)
+        for (const rule of rules) this.loadedRules.push(rule)
+      this.ignore.add(rules)
+    }
   }
 }
 
@@ -122,25 +136,33 @@ function prefixGitignoreRules(
 }
 
 export default class Gitignore {
-  fs: Fs
-  git: Git
-  env: Record<string, string | undefined>
-  directories: Record<string, DirectoryEntry> = {}
-  directoriesAsync: Record<string, Promise<DirectoryEntry>> = {}
+  private fs: Fs
+  private git: Git
+  private env: Record<string, string | undefined>
+  private directories: Record<string, DirectoryEntry> = {}
+  private directoriesAsync: Record<string, Promise<DirectoryEntry>> = {}
+  private initialRules: string[] | undefined
+  private finalRules: string[] | undefined
 
   constructor({
     fs = defaultFs,
     git = defaultGit,
     env = process.env,
+    initialRules,
+    finalRules,
   }: {
     fs?: Fs
     fsPromises?: FsPromises
     git?: Git
     env?: Record<string, string | undefined>
+    initialRules?: string[]
+    finalRules?: string[]
   } = {}) {
     this.fs = fs
     this.git = git
     this.env = env
+    this.initialRules = initialRules
+    this.finalRules = finalRules
   }
 
   clearCache(): void {
@@ -194,9 +216,12 @@ export default class Gitignore {
       return parentEntry
     const { rootDir } = parentEntry
     const entry = new DirectoryEntry(rootDir)
-    entry.ignore.add(parentEntry.ignore)
+    if (this.initialRules)
+      entry.add(this.initialRules, { addToLoadedRules: false })
+    entry.add(parentEntry)
     const gitignoreRules = this.parseGitignoreSync(gitignore)
-    entry.ignore.add(prefixGitignoreRules(gitignoreRules, dir, rootDir))
+    entry.add(prefixGitignoreRules(gitignoreRules, dir, rootDir))
+    if (this.finalRules) entry.add(this.finalRules, { addToLoadedRules: false })
     return entry
   }
 
@@ -210,9 +235,12 @@ export default class Gitignore {
       return parentEntry
     const { rootDir } = parentEntry
     const entry = new DirectoryEntry(rootDir)
-    entry.ignore.add(parentEntry.ignore)
+    if (this.initialRules)
+      entry.add(this.initialRules, { addToLoadedRules: false })
+    entry.add(parentEntry)
     const gitignoreRules = await this.parseGitignore(gitignore)
-    entry.ignore.add(prefixGitignoreRules(gitignoreRules, dir, rootDir))
+    entry.add(prefixGitignoreRules(gitignoreRules, dir, rootDir))
+    if (this.finalRules) entry.add(this.finalRules, { addToLoadedRules: false })
     return entry
   }
 
@@ -223,7 +251,9 @@ export default class Gitignore {
 
   private createRootDirectoryEntrySync(dir: string): DirectoryEntry {
     const entry = new DirectoryEntry(dir)
-    entry.ignore.add('.git')
+    if (this.initialRules)
+      entry.add(this.initialRules, { addToLoadedRules: false })
+    entry.add(['.git'])
     const addGitignoreRules = (file: string) => {
       let rules
       try {
@@ -231,7 +261,7 @@ export default class Gitignore {
       } catch (error) {
         return
       }
-      entry.ignore.add(rules)
+      entry.add(rules)
     }
     const coreExcludesFile = this.git.getCoreExcludesFileSync({ cwd: dir })
     if (coreExcludesFile) addGitignoreRules(coreExcludesFile)
@@ -242,12 +272,15 @@ export default class Gitignore {
       addGitignoreRules(Path.join(dir, '.git', 'info', 'exclude'))
     }
     addGitignoreRules(Path.join(dir, '.gitignore'))
+    if (this.finalRules) entry.add(this.finalRules, { addToLoadedRules: false })
     return entry
   }
 
   private async createRootDirectoryEntry(dir: string): Promise<DirectoryEntry> {
     const entry = new DirectoryEntry(dir)
-    entry.ignore.add('.git')
+    if (this.initialRules)
+      entry.add(this.initialRules, { addToLoadedRules: false })
+    entry.add(['.git'])
     const addGitignoreRules = async (file: string): Promise<void> => {
       let rules
       try {
@@ -255,7 +288,7 @@ export default class Gitignore {
       } catch (error) {
         return
       }
-      entry.ignore.add(rules)
+      entry.add(rules)
     }
     const coreExcludesFile = await this.git.getCoreExcludesFile({ cwd: dir })
     if (coreExcludesFile) await addGitignoreRules(coreExcludesFile)
@@ -266,6 +299,7 @@ export default class Gitignore {
       await addGitignoreRules(Path.join(dir, '.git', 'info', 'exclude'))
     }
     await addGitignoreRules(Path.join(dir, '.gitignore'))
+    if (this.finalRules) entry.add(this.finalRules, { addToLoadedRules: false })
     return entry
   }
 

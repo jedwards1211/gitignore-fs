@@ -30,6 +30,20 @@ console.log(gitignore.ignores('node_modules')) // true or false depending on you
 
 Each instance of this class keeps a separate cache of gitignore rules.
 
+### `new Gitignore([options])`
+
+Creates a new Gitignore instance.
+
+#### `options.initialRules` (`string[]`, _optional_)
+
+These rules will be applied at lowest precedence (lower than rules from `core.excludesFile`).
+Paths with a slash in the beginning or middle are relative to the closest enclosing git directory.
+
+#### `options.finalRules` (`string[]`, _optional_)
+
+These rules will be applied at highest precedence (higher than `.gitignore` files).
+Paths with a slash in the beginning or middle are relative to the closest enclosing git directory.
+
 ### `.ignores(path)`
 
 Determines if the given `path` is gitignored asynchronously.
