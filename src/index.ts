@@ -139,8 +139,8 @@ export default class Gitignore {
   private fs: Fs
   private git: Git
   private env: Record<string, string | undefined>
-  private directories: Record<string, DirectoryEntry> = {}
-  private directoriesAsync: Record<string, Promise<DirectoryEntry>> = {}
+  private directories: Map<string, DirectoryEntry> = new Map()
+  private directoriesAsync: Map<string, Promise<DirectoryEntry>> = new Map()
   private initialRules: string[] | undefined
   private finalRules: string[] | undefined
 
@@ -166,8 +166,8 @@ export default class Gitignore {
   }
 
   clearCache(): void {
-    this.directories = {}
-    this.directoriesAsync = {}
+    this.directories.clear()
+    this.directoriesAsync.clear()
   }
 
   async ignores(path: string): Promise<boolean> {
@@ -187,21 +187,21 @@ export default class Gitignore {
   }
 
   private getDirectoryEntrySync(dir: string): DirectoryEntry {
-    let cached = this.directories[dir]
+    let cached = this.directories.get(dir)
     if (!cached) {
       cached = this.createDirectoryEntrySync(dir)
-      this.directories[dir] = cached
-      this.directoriesAsync[dir] = Promise.resolve(cached)
+      this.directories.set(dir, cached)
+      this.directoriesAsync.set(dir, Promise.resolve(cached))
     }
     return cached
   }
 
   private async getDirectoryEntry(dir: string): Promise<DirectoryEntry> {
-    let cached = this.directoriesAsync[dir]
+    let cached = this.directoriesAsync.get(dir)
     if (!cached) {
       cached = this.createDirectoryEntry(dir)
-      this.directoriesAsync[dir] = cached
-      cached.then((entry) => (this.directories[dir] = entry))
+      this.directoriesAsync.set(dir, cached)
+      cached.then((entry) => this.directories.set(dir, entry))
     }
     return cached
   }
