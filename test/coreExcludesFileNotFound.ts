@@ -21,6 +21,12 @@ declareTest('core.excludesFile not found', {
       'test.js': '',
     },
   },
-  coreExcludesFile: '.gitignore_global',
-  expectIncludes: ['src/test.js', '.gitignore'],
+  coreExcludesFile: '/.gitignore_global',
+  expectIncludes: ['/src/test.js', '/.gitignore'],
+  expectIgnoreFiles: [
+    '/.gitignore_global',
+    '/.git/info/exclude',
+    '/.gitignore',
+    '/src/.gitignore',
+  ],
 })

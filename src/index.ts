@@ -4,6 +4,8 @@ import { promisify } from 'util'
 import Path from 'path'
 import { spawnSync } from 'child_process'
 import { spawn } from 'promisify-child-process'
+import EventEmitter from 'events'
+import TypedEmitter from 'typed-emitter'
 
 export interface FsStats {
   isFile(): boolean
@@ -135,7 +137,11 @@ function prefixGitignoreRules(
   })
 }
 
-export default class Gitignore {
+export interface GitignoreEvents {
+  ignoreFile: (file: string) => void
+}
+
+export default class Gitignore extends (EventEmitter as new () => TypedEmitter<GitignoreEvents>) {
   private fs: Fs
   private git: Git
   private env: Record<string, string | undefined>
@@ -143,6 +149,7 @@ export default class Gitignore {
   private directoriesAsync: Map<string, Promise<DirectoryEntry>> = new Map()
   private initialRules: string[] | undefined
   private finalRules: string[] | undefined
+  private ignoreFiles: Set<string> = new Set()
 
   constructor({
     fs = defaultFs,
@@ -158,6 +165,7 @@ export default class Gitignore {
     initialRules?: string[]
     finalRules?: string[]
   } = {}) {
+    super()
     this.fs = fs
     this.git = git
     this.env = env
@@ -168,6 +176,7 @@ export default class Gitignore {
   clearCache(): void {
     this.directories.clear()
     this.directoriesAsync.clear()
+    this.ignoreFiles.clear()
   }
 
   async ignores(path: string): Promise<boolean> {
@@ -212,8 +221,9 @@ export default class Gitignore {
     }
     const parentEntry = this.getDirectoryEntrySync(Path.dirname(dir))
     const gitignore = Path.join(dir, '.gitignore')
-    if (parentEntry.ignores(dir + '/') || !this.isFileSync(gitignore))
-      return parentEntry
+    if (parentEntry.ignores(dir + '/')) return parentEntry
+    if (this.isDirectorySync(dir)) this.emitIgnoreFile(gitignore)
+    if (!this.isFileSync(gitignore)) return parentEntry
     const { rootDir } = parentEntry
     const entry = new DirectoryEntry(rootDir)
     if (this.initialRules)
@@ -231,8 +241,9 @@ export default class Gitignore {
     }
     const parentEntry = await this.getDirectoryEntry(Path.dirname(dir))
     const gitignore = Path.join(dir, '.gitignore')
-    if (parentEntry.ignores(dir + '/') || !(await this.isFile(gitignore)))
-      return parentEntry
+    if (parentEntry.ignores(dir + '/')) return parentEntry
+    if (await this.isDirectory(dir)) this.emitIgnoreFile(gitignore)
+    if (!(await this.isFile(gitignore))) return parentEntry
     const { rootDir } = parentEntry
     const entry = new DirectoryEntry(rootDir)
     if (this.initialRules)
@@ -264,7 +275,8 @@ export default class Gitignore {
       entry.add(rules)
     }
     const coreExcludesFile = this.git.getCoreExcludesFileSync({ cwd: dir })
-    if (coreExcludesFile) addGitignoreRules(coreExcludesFile)
+    if (coreExcludesFile)
+      addGitignoreRules(normalizeInputPath(coreExcludesFile))
     const GIT_DIR = this.getGitDir()
     if (GIT_DIR && dir === Path.dirname(GIT_DIR)) {
       addGitignoreRules(Path.join(GIT_DIR, 'info', 'exclude'))
@@ -291,7 +303,8 @@ export default class Gitignore {
       entry.add(rules)
     }
     const coreExcludesFile = await this.git.getCoreExcludesFile({ cwd: dir })
-    if (coreExcludesFile) await addGitignoreRules(coreExcludesFile)
+    if (coreExcludesFile)
+      await addGitignoreRules(normalizeInputPath(coreExcludesFile))
     const GIT_DIR = this.getGitDir()
     if (GIT_DIR && dir === Path.dirname(GIT_DIR)) {
       await addGitignoreRules(Path.join(GIT_DIR, 'info', 'exclude'))
@@ -303,11 +316,20 @@ export default class Gitignore {
     return entry
   }
 
+  private emitIgnoreFile(path: string) {
+    if (!this.ignoreFiles.has(path)) {
+      this.ignoreFiles.add(path)
+      this.emit('ignoreFile', path)
+    }
+  }
+
   private parseGitignoreSync(path: string): string[] {
+    this.emitIgnoreFile(path)
     return this.fs.readFileSync(path, 'utf8').split(/\r\n?|\n/gm)
   }
 
   private async parseGitignore(path: string): Promise<string[]> {
+    this.emitIgnoreFile(path)
     return (await this.fs.readFile(path, 'utf8')).split(/\r\n?|\n/gm)
   }
 

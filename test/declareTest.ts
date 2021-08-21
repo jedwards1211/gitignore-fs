@@ -14,7 +14,8 @@ class TestFs implements Fs, FsPromises {
   }
 
   getEntry(path: string): string | Record<string, any> | void {
-    path = Path.relative(process.cwd(), Path.resolve(path))
+    // path = Path.relative(process.cwd(), Path.resolve(path))
+    path = path.replace(/^\//, '')
     const parent = Path.dirname(path)
     if (parent && parent !== path && parent !== '.') {
       const parentEntry = this.getEntry(parent)
@@ -66,7 +67,7 @@ function getAllPaths(files: Record<string, any>): string[] {
       }
     }
   }
-  helper('', files)
+  helper('/', files)
   return result.sort()
 }
 
@@ -105,13 +106,21 @@ export default function declareTest(
     coreExcludesFile?: string
     env?: Record<string, string | undefined>
     expectIncludes: string[]
+    expectIgnoreFiles?: string[]
     initialRules?: string[]
     finalRules?: string[]
   }
 ): void {
   const body = () => {
     for (const clearCache of [true, false]) {
-      const { files, coreExcludesFile, env, initialRules, finalRules } = options
+      const {
+        files,
+        coreExcludesFile,
+        env,
+        initialRules,
+        finalRules,
+        expectIgnoreFiles,
+      } = options
 
       it(
         clearCache ? 'clearing cache every time' : 'not clearing cache',
@@ -126,6 +135,11 @@ export default function declareTest(
 
           const actualSync = {}
           const actualAsync = {}
+          const actualIgnoreFiles = new Set()
+
+          gitignore.on('ignoreFile', (file) => {
+            actualIgnoreFiles.add(file)
+          })
 
           for (const path of getAllPaths(files)) {
             if (clearCache) gitignore.clearCache()
@@ -145,6 +159,12 @@ export default function declareTest(
 
           expect(actualSync, 'ignoresSync results').to.deep.equal(expected)
           expect(actualAsync, 'ignores results').to.deep.equal(expected)
+
+          if (expectIgnoreFiles) {
+            expect([...actualIgnoreFiles], 'ignoreFiles').to.have.members(
+              expectIgnoreFiles
+            )
+          }
         }
       )
     }

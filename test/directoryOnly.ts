@@ -20,5 +20,6 @@ declareTest('directory only exclusion', {
       lib: '',
     },
   },
-  expectIncludes: ['.gitignore', 'src/test.js', 'src/lib'],
+  expectIncludes: ['/.gitignore', '/src/test.js', '/src/lib'],
+  expectIgnoreFiles: ['/.gitignore', '/.git/info/exclude', '/src/.gitignore'],
 })

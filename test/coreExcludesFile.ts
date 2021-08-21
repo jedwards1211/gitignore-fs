@@ -29,11 +29,19 @@ declareTest('core.excludesFile', {
       *.txt
     `,
   },
-  coreExcludesFile: '.gitignore_global',
+  coreExcludesFile: '/.gitignore_global',
   expectIncludes: [
-    'project/src/test.js',
-    'project/test.txt',
-    'project/.gitignore',
-    '.gitignore_global',
+    '/project/src/test.js',
+    '/project/test.txt',
+    '/project/.gitignore',
+    '/.gitignore_global',
+  ],
+  expectIgnoreFiles: [
+    '/.gitignore_global',
+    '/.git/info/exclude',
+    '/.gitignore',
+    '/project/.gitignore',
+    '/project/.git/info/exclude',
+    '/project/src/.gitignore',
   ],
 })
