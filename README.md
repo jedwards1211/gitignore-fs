@@ -21,7 +21,7 @@ const Gitignore = require('gitignore-fs')
 
 const gitignore = new Gitignore()
 
-console.log(gitignore.ignores('node_modules')) // true or false depending on your config
+console.log(gitignore.ignoresSync('node_modules')) // true or false depending on your config
 ```
 
 # API
