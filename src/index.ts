@@ -201,7 +201,10 @@ export default class Gitignore {
     if (!cached) {
       cached = this.createDirectoryEntry(dir)
       this.directoriesAsync[dir] = cached
-      cached.then((entry) => (this.directories[dir] = entry))
+      cached.then((entry) => {
+        if (this.directoriesAsync[dir] === cached)
+          this.directories[dir] = entry
+      })
     }
     return cached
   }
