@@ -6,6 +6,8 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![npm version](https://badge.fury.io/js/gitignore-fs.svg)](https://badge.fury.io/js/gitignore-fs)
 
+If you're using a library to ignore gitignored files, it probably doesn't do it right!  Use this library to be match git behavior 100%.
+
 Determine if any file is gitignored. This is intended to be a complete implementation of the gitignore spec, including `$GIT_DIR`, `$GIT_DIR/info/excludes`, and the `core.excludesFile` configuration variable.
 
 **Requires Node >= 8.**
