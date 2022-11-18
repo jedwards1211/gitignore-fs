@@ -3,6 +3,7 @@
   "version": "0.0.0-development",
   "description": "determine if any file is gitignored (complete implementation of gitignore rules)",
   "main": "index.cjs",
+  "types": "index.d.ts",
   "sideEffects": false,
   "engines": {
     "node": ">=8"
@@ -16,6 +17,7 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
+      "types": "./index.d.ts",
       "import": "./index.mjs",
       "require": "./index.cjs"
     }
