@@ -30,15 +30,6 @@ const defaultFs: Fs = {
   readFile: promisify(fs.readFile),
   readFileSync: fs.readFileSync,
 }
-
-export interface FsPromises {
-  stat(path: string): Promise<FsStats>
-  readFile(
-    path: string,
-    options?: string | { encoding?: string; flag?: string }
-  ): Promise<string>
-}
-
 export interface Git {
   getCoreExcludesFile(options: { cwd: string }): Promise<string | undefined>
   getCoreExcludesFileSync(options: { cwd: string }): string | undefined
@@ -152,7 +143,6 @@ export default class Gitignore {
     finalRules,
   }: {
     fs?: Fs
-    fsPromises?: FsPromises
     git?: Git
     env?: Record<string, string | undefined>
     initialRules?: string[]
