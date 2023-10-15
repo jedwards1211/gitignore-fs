@@ -19,7 +19,7 @@ npm install --save gitignore-fs
 ```
 
 ```js
-const Gitignore = require('gitignore-fs')
+const Gitignore = require('gitignore-fs').default
 
 const gitignore = new Gitignore()
 
