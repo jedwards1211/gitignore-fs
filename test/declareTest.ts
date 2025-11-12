@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-env mocha */
 
-import Gitignore, { Fs, FsPromises, FsStats, Git } from '../src/index'
+import Gitignore, { Fs, FsStats, Git } from '../src/index'
 import Path from 'path'
 import { expect } from 'chai'
 import { describe, it } from 'mocha'
 
-class TestFs implements Fs, FsPromises {
+class TestFs implements Fs {
   paths: Record<string, any>
 
   constructor(paths: Record<string, any>) {
@@ -18,8 +17,8 @@ class TestFs implements Fs, FsPromises {
     const parent = Path.dirname(path)
     if (parent && parent !== path && parent !== '.') {
       const parentEntry = this.getEntry(parent)
-      return parentEntry instanceof Object
-        ? parentEntry[Path.basename(path)]
+      return parentEntry instanceof Object ?
+          parentEntry[Path.basename(path)]
         : undefined
     }
     return this.paths[path]
@@ -124,8 +123,8 @@ export default function declareTest(
             finalRules,
           })
 
-          const actualSync = {}
-          const actualAsync = {}
+          const actualSync: { [K in string]?: boolean } = {}
+          const actualAsync: { [K in string]?: boolean } = {}
 
           for (const path of getAllPaths(files)) {
             if (clearCache) gitignore.clearCache()

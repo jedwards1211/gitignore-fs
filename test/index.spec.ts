@@ -1,10 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-env mocha */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 
 import Gitignore from '../src/index'
 import Path from 'path'
 import { expect } from 'chai'
 import { describe, it } from 'mocha'
+// @ts-expect-error toolchain not behaving when there's a .d.cts right now
+import rootDir from './rootDir.cjs'
 
 for (const clearCache of [true, false]) {
   const expectIncludes = async (gitignore: Gitignore, paths: string[]) => {
@@ -42,14 +44,12 @@ for (const clearCache of [true, false]) {
             'node_modules',
             'node_modules/ignore',
             'node_modules/ignore/package.json',
-            'index.js',
-            'index.d.ts',
-          ].map((path) => Path.resolve(__dirname, '..', path))
+          ].map((path) => Path.resolve(rootDir, path))
         )
         await expectIncludes(
           gitignore,
           ['src/index.ts', 'package.json', '.gitignore'].map((path) =>
-            Path.resolve(__dirname, '..', path)
+            Path.resolve(rootDir, path)
           )
         )
       })

@@ -14,7 +14,7 @@ export interface Fs {
   stat(path: string): Promise<FsStats>
   readFile(
     path: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     options?: string | { encoding?: string; flag?: string; signal?: any }
   ): Promise<string>
   statSync(path: string): FsStats
@@ -50,8 +50,8 @@ const defaultGit: Git = {
           maxBuffer: 1024 * 1024,
         }
       )
-      return stdout?.toString()?.trim()
-    } catch (error) {
+      return stdout?.toString().trim()
+    } catch {
       return undefined
     }
   },
@@ -61,9 +61,9 @@ const defaultGit: Git = {
         cwd,
         maxBuffer: 1024 * 1024,
       })
-        .stdout?.toString()
-        ?.trim()
-    } catch (error) {
+        .stdout.toString()
+        .trim()
+    } catch {
       return undefined
     }
   },
@@ -75,8 +75,8 @@ function normalizeInputPath(path: string): string {
 }
 
 function relativePath(from: string, to: string): string {
-  return to.endsWith('/')
-    ? Path.relative(from, to) + '/'
+  return to.endsWith('/') ?
+      Path.relative(from, to) + '/'
     : Path.relative(from, to)
 }
 
@@ -120,8 +120,8 @@ function prefixGitignoreRules(
   return rules.map(function prefixRule(rule: string): string {
     if (rule.startsWith('#') || !/\S/.test(rule)) return rule
     if (rule.startsWith('!')) return '!' + prefixRule(rule.substring(1))
-    return /\/\S/.test(rule)
-      ? `${prefix}/${rule.replace(/^\//, '')}`
+    return /\/\S/.test(rule) ?
+        `${prefix}/${rule.replace(/^\//, '')}`
       : `${prefix}/**/${rule}`
   })
 }
@@ -130,8 +130,8 @@ export default class Gitignore {
   private fs: Fs
   private git: Git
   private env: Record<string, string | undefined>
-  private directories: Record<string, DirectoryEntry> = {}
-  private directoriesAsync: Record<string, Promise<DirectoryEntry>> = {}
+  private directories: { [K in string]?: DirectoryEntry } = {}
+  private directoriesAsync: { [K in string]?: Promise<DirectoryEntry> } = {}
   private initialRules: string[] | undefined
   private finalRules: string[] | undefined
 
@@ -191,9 +191,13 @@ export default class Gitignore {
     if (!cached) {
       cached = this.createDirectoryEntry(dir)
       this.directoriesAsync[dir] = cached
-      cached.then((entry) => {
-        if (this.directoriesAsync[dir] === cached) this.directories[dir] = entry
-      })
+      cached.then(
+        (entry) => {
+          if (this.directoriesAsync[dir] === cached)
+            this.directories[dir] = entry
+        },
+        () => {}
+      )
     }
     return cached
   }
@@ -250,7 +254,7 @@ export default class Gitignore {
       let rules
       try {
         rules = this.parseGitignoreSync(file)
-      } catch (error) {
+      } catch {
         return
       }
       entry.add(rules)
@@ -277,7 +281,7 @@ export default class Gitignore {
       let rules
       try {
         rules = await this.parseGitignore(file)
-      } catch (error) {
+      } catch {
         return
       }
       entry.add(rules)
@@ -307,7 +311,7 @@ export default class Gitignore {
     try {
       const stats = this.fs.statSync(path)
       return stats.isFile()
-    } catch (error) {
+    } catch {
       return false
     }
   }
@@ -315,7 +319,7 @@ export default class Gitignore {
     try {
       const stats = await this.fs.stat(path)
       return stats.isFile()
-    } catch (error) {
+    } catch {
       return false
     }
   }
@@ -324,7 +328,7 @@ export default class Gitignore {
     try {
       const stats = this.fs.statSync(path)
       return stats.isDirectory()
-    } catch (error) {
+    } catch {
       return false
     }
   }
@@ -333,7 +337,7 @@ export default class Gitignore {
     try {
       const stats = await this.fs.stat(path)
       return stats.isDirectory()
-    } catch (error) {
+    } catch {
       return false
     }
   }
@@ -344,15 +348,15 @@ export default class Gitignore {
 
   private isGitRootSync(dir: string): boolean {
     const GIT_DIR = this.getGitDir()
-    return GIT_DIR
-      ? dir === Path.dirname(GIT_DIR)
+    return GIT_DIR ?
+        dir === Path.dirname(GIT_DIR)
       : this.isDirectorySync(Path.join(dir, '.git'))
   }
 
   private async isGitRoot(dir: string): Promise<boolean> {
     const GIT_DIR = this.getGitDir()
-    return GIT_DIR
-      ? dir === Path.dirname(GIT_DIR)
+    return GIT_DIR ?
+        dir === Path.dirname(GIT_DIR)
       : await this.isDirectory(Path.join(dir, '.git'))
   }
 }
