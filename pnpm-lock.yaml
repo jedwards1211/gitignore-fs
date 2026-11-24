@@ -15,8 +15,8 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4
       ignore:
-        specifier: ^5.1.8
-        version: 5.3.2
+        specifier: ^7.0.16
+        version: 7.0.16
       promisify-child-process:
         specifier: ^4.1.1
         version: 4.1.2
@@ -1486,8 +1486,8 @@ packages:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
-  ignore@7.0.5:
-    resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
+  ignore@7.0.16:
+    resolution: {integrity: sha512-52N+Y4HRMOJmbLmr+DqO4iSRyyB7N52gm7PWCT6h0p978+oKbqHCB7gIJIwZvBUsjlSdWbrBFqUSmIFNZMpn0A==}
     engines: {node: '>= 4'}
 
   import-fresh@3.3.1:
@@ -3387,7 +3387,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.46.4
       eslint: 9.39.1
       graphemer: 1.4.0
-      ignore: 7.0.5
+      ignore: 7.0.16
       natural-compare: 1.4.0
       ts-api-utils: 2.1.0(typescript@5.9.3)
       typescript: 5.9.3
@@ -4053,7 +4053,7 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  ignore@7.0.5: {}
+  ignore@7.0.16: {}
 
   import-fresh@3.3.1:
     dependencies:

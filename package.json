@@ -55,7 +55,7 @@
   "dependencies": {
     "@babel/runtime": "^7.26.0",
     "babel-plugin-add-module-exports": "^1.0.4",
-    "ignore": "^5.1.8",
+    "ignore": "^7.0.16",
     "promisify-child-process": "^4.1.1"
   },
   "main": "dist/index.js",
