@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-
 import Gitignore, { Fs, FsStats, Git } from '../src/index'
 import Path from 'path'
 import { expect } from 'chai'

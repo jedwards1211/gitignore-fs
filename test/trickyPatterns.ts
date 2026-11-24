@@ -6,14 +6,12 @@ declareTest('tricky patterns - **[!te]', {
     '.git': {
       HEAD: '',
     },
-    'ten': '',
+    ten: '',
     '.gitignore': dedent`
       **[!te]
     `,
   },
-  expectIncludes: [
-    '.gitignore',
-  ],
+  expectIncludes: ['.gitignore'],
 })
 declareTest('tricky patterns - foo[/]bar', {
   files: {
@@ -27,10 +25,7 @@ declareTest('tricky patterns - foo[/]bar', {
       foo[/]bar
     `,
   },
-  expectIncludes: [
-    '.gitignore',
-    'foo/bar'
-  ],
+  expectIncludes: ['.gitignore', 'foo/bar'],
 })
 declareTest('tricky patterns - \\??\\?b', {
   files: {
@@ -42,21 +37,17 @@ declareTest('tricky patterns - \\??\\?b', {
       \\??\\?b
     `,
   },
-  expectIncludes: [
-    '.gitignore',
-  ],
+  expectIncludes: ['.gitignore'],
 })
 declareTest('tricky patterns - \\a\\b\\c', {
   files: {
     '.git': {
       HEAD: '',
     },
-    'abc': '',
+    abc: '',
     '.gitignore': dedent`
       \\a\\b\\c
     `,
   },
-  expectIncludes: [
-    '.gitignore',
-  ],
+  expectIncludes: ['.gitignore'],
 })

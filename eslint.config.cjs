@@ -11,4 +11,10 @@ module.exports = defineConfig([
       },
     },
   },
+  {
+    files: ['test/index.spec.ts', 'test/declareTest.ts'],
+    languageOptions: {
+      globals: globals.mocha,
+    },
+  },
 ])

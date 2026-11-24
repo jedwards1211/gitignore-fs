@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
 import Gitignore from '../src/index'
